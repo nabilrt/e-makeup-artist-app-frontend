@@ -1,5 +1,5 @@
 import GeneralTopBar from "../topbars/GeneralTopBar";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axios from "axios";
 
@@ -12,6 +12,7 @@ const ArtistRegister=()=>{
     const[dob,setDOB]=useState("");
     const[portfolio,setPortfolio]=useState("");
     const[area,setArea]=useState("");
+    let history=useNavigate()
     useEffect(()=>{
 
         axios.get("https://localhost:44306/api/areas").then(resp=>{
@@ -32,6 +33,12 @@ const ArtistRegister=()=>{
         console.log(dob);
         console.log(portfolio);
         console.log(area);
+        var obj={Username:username,Name:name,Email:email,Password: password,DOB:dob,Portfolio_Link:portfolio,AreaId:area,User_Type:"Artist",Is_Approved:0}
+        axios.post("https://localhost:44306/api/artist/add",obj).then(resp=>{
+            history("/unverified")
+        }).catch(err=>{
+            console.log(err.response.data);
+        })
     }
 
 
@@ -48,7 +55,7 @@ const ArtistRegister=()=>{
                                     <div className="col-7">
                                         <div className="text-primary p-4">
                                             <h5 className="text-primary">Artist Registration</h5>
-                                            <small>Your Informations are bound to Verification</small>
+                                            <small>Your Information's are bound to Verification</small>
                                         </div>
                                     </div>
                                     <div className="col-5 align-self-end">

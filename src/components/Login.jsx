@@ -1,14 +1,61 @@
 import GeneralTopBar from "./topbars/GeneralTopBar";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useState} from "react";
+import axios from "axios";
 
 const Login=()=>{
     const[username,setUsername]=useState("");
     const[password,setPassword]=useState("");
+    const[userType,setUserType]=useState("");
+    const history=useNavigate();
 
     const LoginSubmit=()=>{
         console.log(username);
         console.log(password);
+        var obj={Username:username,Password:password};
+        axios.post("https://localhost:44306/api/login",obj).then(resp=>{
+            var token=resp.data;
+            console.log(token);
+            if(token==="Unapproved"){
+                history("/unverified");
+            }
+            else{
+                //getUserType(token.UserId);
+                //console.log(userType)
+             //
+                var obje={Id:token.UserId}
+                axios.post("https://localhost:44306/api/user/find",obje).then(resp=>{
+                    var us=resp.data;
+                    var user={userId:token.UserId,accessToken:token.TokenDetails,user_type:us.user_Type}
+                    localStorage.setItem('user',JSON.stringify(user));
+                    axios.defaults.headers.common["Authorization"] = token.TokenDetails;
+                    if(us.User_Type==="Artist"){
+                        history("/artist/dashboard");
+                    }
+                    if(us.User_Type==="Admin"){
+                        history("/admin/dashboard");
+                    }
+                    if(us.User_Type==="Customer"){
+                        history("/customer/dashboard");
+                    }
+                }).catch(err=>{
+                   console.log(err.response.data)
+                });
+
+            }
+        }).catch(err=>{
+           console.log(err.response.data);
+        });
+    }
+
+    const getUserType=(id)=>{
+        var obje={Id:id}
+        axios.post("https://localhost:44306/api/user/find",obje).then(resp=>{
+            setUserType(resp.data.User_Type);
+
+        }).catch(err=>{
+            console.log(err.response.data);
+        })
     }
 
     return(

@@ -1,20 +1,22 @@
-import GeneralTopBar from "../topbars/GeneralTopBar";
-import {Link, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import axios from "axios";
+import GeneralTopBar from "../topbars/GeneralTopBar";
+import ArtistTopBar from "../topbars/ArtistTopBar";
 
-const CustomerRegister=()=>{
+const ArtistProfile=()=>{
     const [Areas,SetAreas]=useState([]);
     const[name,setName]=useState("");
     const[username,setUsername]=useState("");
     const[email,setEmail]=useState("");
     const[password,setPassword]=useState("");
     const[dob,setDOB]=useState("");
-    const[address,setAddress]=useState("");
+    const[portfolio,setPortfolio]=useState("");
     const[area,setArea]=useState("");
-    let history=useNavigate()
-    useEffect(()=>{
-
+    let history=useNavigate();
+    let data = JSON.parse(localStorage.getItem('user'))
+    console.log(data)
+    useEffect(() => {
         axios.get("https://localhost:44306/api/areas").then(resp=>{
             console.log(resp.data);
             SetAreas(resp.data);
@@ -22,29 +24,53 @@ const CustomerRegister=()=>{
             console.log(err.response.data);
         });
 
+        const AxiosConfig = axios.create({
+            baseURL: 'https://localhost:44306/api',
+            headers: {
+                Authorization: data.accessToken
+                // UserId: data.userId
+            }
+        });
 
-    },[]);
+        var url = 'artist/get/' + data.userId
+        AxiosConfig.get(url).then(res => {
 
-    const RegisterSubmit=()=>{
-        console.log(name);
-        console.log(username);
-        console.log(email);
-        console.log(password);
-        console.log(dob);
-        console.log(address);
-        console.log(area);
-        var obj={Username:username,Name:name,Email:email,Password: password,DOB:dob,Address:address,AreaId:area,User_Type:"Customer",Is_Approved:1,Is_Premium:0}
-        axios.post("https://localhost:44306/api/customer/add",obj).then(resp=>{
-            history("/login")
-        }).catch(err=>{
-            console.log(err.response.data);
+
+            var obj={Id:data.userId}
+            axios.get("https://localhost:44306/api/artist/get/"+data.userId).then(resp=>{
+                setName(resp.data.Name);
+                setUsername(resp.data.Username);
+                setEmail(resp.data.Email);
+                setPassword(resp.data.Password);
+                setDOB(resp.data.DOB);
+                setArea(resp.data.AreaId);
+                setPortfolio(resp.data.Portfolio_Link);
+            }).catch(err=>{
+                console.log(err.response.data)
+            })
+
+
+
+        }).catch(err => {
+            console.log(err);
+            history("/login");
         })
-    }
+    }, [])
 
+    const updateProfile=()=>{
+        var obj={Id:data.userId,Username:username,Name:name,Email:email,Password: password,DOB:dob,Portfolio_Link:portfolio,AreaId:area}
+        axios.post("https://localhost:44306/api/artist/update",obj).then(resp=>{
+            history("/artist/profile")
+        }).catch(err=>{
+            console.log(err.response.data)
+        })
+
+
+    }
 
     return(
         <>
-            <GeneralTopBar/> <br/><br/>
+            <ArtistTopBar/> <br/><br/>
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-8 col-lg-6 col-xl-5">
@@ -53,8 +79,8 @@ const CustomerRegister=()=>{
                                 <div className="row">
                                     <div className="col-7">
                                         <div className="text-primary p-4">
-                                            <h5 className="text-primary">Customer Registration</h5>
-                                            <small>Welcome to our application</small>
+                                            <h5 className="text-primary">Artist Registration</h5>
+                                            <small>Your Information's are bound to Verification</small>
                                         </div>
                                     </div>
                                     <div className="col-5 align-self-end">
@@ -80,7 +106,7 @@ const CustomerRegister=()=>{
 
                                         <div className="mb-3">
                                             <label className="form-label">Username</label>
-                                            <input type="text" className="form-control"  placeholder="Enter username" value={username} onChange={(e)=>setUsername(e.target.value)}/>
+                                            <input type="text" className="form-control" placeholder="Enter username" value={username} onChange={(e)=>setUsername(e.target.value)}/>
                                         </div>
 
                                         <div className="mb-3">
@@ -93,25 +119,28 @@ const CustomerRegister=()=>{
                                             <div className="input-group auth-pass-inputgroup">
                                                 <input type="password" className="form-control" placeholder="Enter password" value={password} onChange={(e)=>setPassword(e.target.value)}
                                                        aria-label="Password" aria-describedby="password-addon"/>
+                                                <button className="btn btn-light " type="button" id="password-addon"><i
+                                                    className="mdi mdi-eye-outline"></i></button>
                                             </div>
                                         </div>
 
                                         <div className="mb-3">
                                             <label  className="form-label">Name</label>
-                                            <input type="text" className="form-control"  placeholder="Enter name" value={name} onChange={(e)=>setName(e.target.value)}/>
+                                            <input type="text" className="form-control"  placeholder="Enter name" value={name} onChange={e=>setName(e.target.value)}/>
                                         </div>
 
                                         <div className="mb-3">
                                             <label className="form-label">Date of Birth</label>
-                                            <input type="date" className="form-control" placeholder="Enter name" value={dob} onChange={(e)=>setDOB(e.target.value)}/>
+                                            <input type="date" className="form-control"  placeholder="Enter name" value={dob} onChange={e=>setDOB(e.target.value)} />
                                         </div>
 
                                         <div className="mb-3">
-                                            <label  className="form-label">Area</label>
+                                            <label htmlFor="username" className="form-label">Area</label>
                                             <select name="AreaId" id="" className="form-select" value={area} onChange={(e)=>setArea(e.target.value)}>
                                                 <option value="">Choose One</option>
                                                 {
                                                     Areas.map((item, i) => (
+
                                                         <option value={item.Id}>{item.Name}</option>
                                                     ))
                                                 }
@@ -119,14 +148,14 @@ const CustomerRegister=()=>{
                                         </div>
 
                                         <div className="mb-3">
-                                            <label className="form-label">Address</label>
-                                            <input type="text" className="form-control" placeholder="Enter Address" value={address} onChange={(e)=>setAddress(e.target.value)}/>
+                                            <label htmlFor="username" className="form-label">Portfolio Link</label>
+                                            <input type="text" className="form-control" id="username" placeholder="Enter Link" value={portfolio} onChange={e=>setPortfolio(e.target.value)}/>
                                         </div>
 
 
 
                                         <div className="mt-3 d-grid">
-                                            <button type="button" className="btn btn-primary waves-effect waves-light" onClick={RegisterSubmit}>Sign Up
+                                            <button className="btn btn-primary waves-effect waves-light" type="button" onClick={updateProfile}>Update
                                             </button>
                                         </div>
 
@@ -153,5 +182,8 @@ const CustomerRegister=()=>{
             </div>
         </>
     )
+
+
+
 }
-export default CustomerRegister;
+export default ArtistProfile;
