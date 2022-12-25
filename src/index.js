@@ -3,11 +3,32 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import Homepage from "./components/Homepage";
+import {BrowserRouter, Route, Router, Routes} from "react-router-dom";
+import About from "./components/About";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import ArtistRegister from "./components/artist/Register";
+import CustomerRegister from "./components/customer/Register";
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+
+      <BrowserRouter>
+
+          <Routes>
+              <Route path="/" index element={<Homepage/>}/>
+              <Route path="/about" element={<About/>}/>
+              <Route path="/login" element={<Login/>}/>
+              <Route path="/register" element={<Register/>}/>
+              <Route path="/artist/register" element={<ArtistRegister/>}/>
+              <Route path="/customer/register" element={<CustomerRegister/>}/>
+          </Routes>
+      </BrowserRouter>
+
+
   </React.StrictMode>
 );
 
