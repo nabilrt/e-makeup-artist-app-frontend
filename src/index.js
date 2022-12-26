@@ -27,6 +27,16 @@ import DeletePackage from "./components/artist/DeletePackage";
 import ManageOrders from "./components/artist/ManageOrders";
 import UpdateOrders from "./components/artist/UpdateOrders";
 import ArtistProfile from "./components/artist/ArtistProfile";
+import CustomerInbox from "./components/customer/Inbox";
+import CustomerConversations from "./components/customer/CustomerConversations";
+import CustomerNewMessage from "./components/customer/CustomerNewMessage";
+import CustomerReplyMessage from "./components/customer/CustomerReplyMessage";
+import Packages from "./components/customer/Packages";
+import Cart from "./components/customer/Cart";
+import MyOrders from "./components/customer/MyOrders";
+import ApproveArtist from "./components/admin/ApproveArtist";
+import PendingRequests from "./components/admin/PendingRequests";
+import Feedbacks from "./components/admin/Feedbacks";
 var token = null;
 if(localStorage.getItem('user')){
     var obj = JSON.parse(localStorage.getItem('user'));
@@ -62,6 +72,21 @@ root.render(
               <Route path="/artist/orders" element={<ManageOrders/>}/>
               <Route path="/artist/order/update/:id" element={<UpdateOrders/>}/>
               <Route path="/artist/profile" element={<ArtistProfile/>}/>
+              <Route path="/customer/dashboard" element={<CustomerDashboard/>}/>
+              <Route path="/customer/inbox" element={<CustomerInbox/>}/>
+              <Route path="/customer/inbox/:id" element={<CustomerConversations/>}/>
+              <Route path="/customer/conversation/message/new/:id" element={<CustomerNewMessage/>}/>
+              <Route path="/customer/conversation/message/reply/:id" element={<CustomerReplyMessage/>}/>
+              <Route path="/packages/all" element={<Packages/>}/>
+              <Route path="/customer/cart" element={<Cart/>}/>
+              <Route path="/customer/orders" element={<MyOrders/>}/>
+              <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
+              <Route path="/admin/artists/approve" element={<ApproveArtist/>}/>
+              <Route path="/admin/approve/artist/:id" element={<PendingRequests/>}/>
+              <Route path="/feedbacks" element={<Feedbacks/>}/>
+
+
+
               <Route path="/logout" element={<Logout/>}/>
           </Routes>
       </BrowserRouter>
